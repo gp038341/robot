@@ -67,15 +67,16 @@ class Player(pygame.sprite.Sprite):
 
 
 
-        self.pos = vec(10, GROUND - 60)
+        self.pos = vec(750, GROUND - 60) #10?
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
-        self.shoot_delay = 500
+        self.shoot_delay = 1000
         self.last_shot = pygame.time.get_ticks()
 
+    
     def shootright(self):
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay:
@@ -220,7 +221,7 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, platforms, False)
         if hits:
             if self.rect.top > hits[0].rect.top: #jumping from underneath
-                self.pos.y = GROUND#hits[0].rect.bottom + 25 + 1
+                self.pos.y = GROUND
                 self.vel.y = 0
             else:
                 self.pos.y = hits[0].rect.top + 1 #jumping from above
@@ -237,11 +238,10 @@ class Mob(pygame.sprite.Sprite):
         self.running_count = 0
         
         self.image = self.running[self.running_count]
-        #self.image = pygame.transform.scale(self.image, (10, 10))
 
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.rect.x = 1000
+        self.rect.x = 1500
         self.rect.y = 895
 
 
@@ -260,7 +260,74 @@ class Mob(pygame.sprite.Sprite):
 
         if self.rect.right < 0:
             self.rect.left = WIDTH
+
+            
+
+class Yellow2(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.running = [pygame.image.load(os.path.join(img_folder, "alienYellow_walk1.png")).convert(),
+                        pygame.image.load(os.path.join(img_folder, "alienYellow_walk2.png")).convert()
+                        ]
+                              
+        self.running_count = 0
+       
+        self.image = self.running[self.running_count]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect.x = 1500
+        self.rect.y = 895
+
+
         
+    def update(self):
+        
+        self.image = self.running[self.running_count]
+        self.image.set_colorkey(BLACK)
+        self.image = pygame.transform.scale(self.image, (60, 80))
+
+        self.running_count += 1
+        if self.running_count > 1:
+            self.running_count = 0 
+
+        self.rect.x += -7
+
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
+
+class Pink3(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.running = [pygame.image.load(os.path.join(img_folder, "alienPink_walk1.png")).convert(),
+                        pygame.image.load(os.path.join(img_folder, "alienPink_walk2.png")).convert()
+                        ]
+                              
+        self.running_count = 0
+        self.image = self.running[self.running_count]
+        self.image.set_colorkey(BLACK)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect.x = -80
+        self.rect.y = 895
+
+
+        
+    def update(self):
+        
+        self.image = self.running[self.running_count]
+        self.image.set_colorkey(BLACK)
+        self.image = pygame.transform.scale(self.image, (60, 80))
+
+        self.running_count += 1
+        if self.running_count > 1:
+            self.running_count = 0 
+
+        self.rect.x += 3
+
+        if self.rect.left > WIDTH:
+            self.rect.left = 0
 
 
 class Platform(pygame.sprite.Sprite):
@@ -281,38 +348,23 @@ class Platform(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.rect.left = WIDTH
 
-
-
-            
-
-class Explosion(pygame.sprite.Sprite):
+class Powerup(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.explosion = [pygame.image.load(os.path.join(img_folder, "bubble_explo1")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo2")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo3")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo4")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo5")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo6")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo7")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo8")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo9")).convert(),
-                          pygame.image.load(os.path.join(img_folder, "bubble_explo10")).convert()
-                          ]
-        
-        self.explosion_count = 0
-        self.image = self.explosion[self.explosion_count]
+        self.image = pygame.image.load(os.path.join(img_folder, "bolt-icon-button-blue.png")).convert()
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect.x = random.randint(100, 800)
+        self.rect.y = random.randint(300, 1000)
 
     def update(self):
-        self.image = self.explosion[self.explosion_count]
-        self.image.set_colorkey(BLACK)
-        self.image = pygame.transform.scale(self.image, (50, 75))
 
-        self.explosion_count += 1
-        if self.explosion_count > 9:
-            self.explosion_count = 0 
+        self.rect.x += 3
 
-
+        if self.rect.left > WIDTH:
+            self.kill()
 
 class Enemyship(pygame.sprite.Sprite):
     def __init__(self):
@@ -388,19 +440,40 @@ background_rect = background.get_rect()
 #SPRITE GROUPS
 
 player = Player()
-#explosion = Explosion()
+powerup = Powerup()
+powerups = pygame.sprite.Group()
+powerups.add(powerup)
 platform = Platform()
 platforms = pygame.sprite.Group()
 platforms.add(platform)
 mob = Mob()
+alien_yellow = Yellow2()
+aliens_yellow = pygame.sprite.Group()
+aliens_yellow.add(alien_yellow)
+alien_pink = Pink3()
+aliens_pink = pygame.sprite.Group()
+aliens_pink.add(alien_pink)
 enemyship = Enemyship()
 mobs = pygame.sprite.Group()
 mobs.add(mob, enemyship)
 bullets = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
-all_sprites.add(player, platform, mob, enemyship)
+all_sprites.add(player, platform, mob, enemyship, alien_yellow, alien_pink, powerup)
 
+def newMob():
+    mob = Mob()
+    all_sprites.add(mob)
+    mobs.add(mob)
 
+def newYellow():
+    alien_yellow = Yellow2()
+    all_sprites.add(alien_yellow)
+    aliens_yellow.add(alien_yellow)
+
+def newPink():
+    alien_pink = Pink3()
+    all_sprites.add(alien_pink)
+    aliens_pink.add(alien_pink)
 
 # GAME LOOP:
 #   Process Events
@@ -408,8 +481,6 @@ all_sprites.add(player, platform, mob, enemyship)
 #   Draw
 running = True
 while running:
-
-    
 
     clock.tick(FPS)
 
@@ -422,18 +493,55 @@ while running:
     all_sprites.update()
 
     #CHECKS TO SEE IF LASER HITS MOB
+    #BLUE ALIEN COLLISION
     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
     for hit in hits:
         explosion_sound = mixer.Sound("explosion.wav")
         explosion_sound.play()
-        #Explosion()
+        newMob()
 
     hit_mob = pygame.sprite.spritecollide(player, mobs, False)
     if hit_mob:
         explosion_sound = mixer.Sound("explosion.wav")
         explosion_sound.play()
         player.kill()
-        #Explosion()
+        running = False
+
+    #YELLOW ALIEN COLLISION
+    hit_yellow = pygame.sprite.spritecollide(player, aliens_yellow, False)
+    if hit_yellow:
+        explosion_sound = mixer.Sound("explosion.wav")
+        explosion_sound.play()
+        player.kill()
+        running = False
+
+    hits_yellow = pygame.sprite.groupcollide(aliens_yellow, bullets, True, True)
+    for hit in hits_yellow:
+        explosion_sound = mixer.Sound("explosion.wav")
+        explosion_sound.play()
+        newYellow()
+        
+    #PINK ALIEN COLLISION
+    hit_pink = pygame.sprite.spritecollide(player, aliens_pink, False)
+    if hit_pink:
+        explosion_sound = mixer.Sound("explosion.wav")
+        explosion_sound.play()
+        player.kill()
+        running = False
+
+    hits_pink = pygame.sprite.groupcollide(aliens_pink, bullets, True, True)
+    for hit in hits_pink:
+        explosion_sound = mixer.Sound("explosion.wav")
+        explosion_sound.play()
+        newPink()
+
+    hit_powerup = pygame.sprite.spritecollide(player, powerups, False)
+    if hit_powerup:
+        #powerup_sound = mixer.Sound("Picked_Coin_Echo.wav")
+        #powerup_sound.play()
+        powerup.kill()
+        player.shoot_delay = 1000 # WORK ON THIS SHOOT DELAY = 0
+       
 
     # DRAW
     screen.blit(background, background_rect)
